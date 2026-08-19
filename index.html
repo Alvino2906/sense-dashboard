@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SENSE Platform · Dashboard</title>
+  <!-- Font & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: #0b0e14;
+      color: #e9edf2;
+      padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    .dashboard {
+      max-width: 1360px;
+      width: 100%;
+    }
+
+    /* header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+      gap: 16px;
+    }
+
+    .logo h1 {
+      font-weight: 600;
+      font-size: 1.9rem;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #a0c8ff, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo span {
+      font-weight: 300;
+      font-size: 0.9rem;
+      color: #8896ab;
+      margin-left: 8px;
+      background: none;
+      -webkit-text-fill-color: #8896ab;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .header-actions i {
+      font-size: 1.2rem;
+      color: #6e7e96;
+      transition: 0.2s;
+      cursor: default;
+    }
+
+    .header-actions i:hover { color: #b0c8e5; }
+
+    .badge-status {
+      background: #1e293b;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      border: 1px solid #2d3a4f;
+      color: #b6ccf0;
+    }
+
+    .badge-status i { margin-right: 6px; color: #4ade80; }
+
+    /* cards row */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: #141a24;
+      border-radius: 20px;
+      padding: 20px 18px;
+      border: 1px solid #26303f;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      transition: 0.2s ease;
+    }
+
+    .stat-card:hover { border-color: #3b82f6; }
+
+    .stat-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #889bb3;
+      margin-bottom: 8px;
+    }
+
+    .stat-number {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      color: #f0f4fe;
+    }
+
+    .stat-sub {
+      font-size: 0.9rem;
+      color: #9aadc9;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-sub i { font-size: 0.8rem; color: #4ade80; }
+
+    .stat-sub .offline-icon { color: #f87171; }
+
+    /* two column */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.8fr 1.2fr;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 900px) {
+      .two-col { grid-template-columns: 1fr; }
+    }
+
+    .table-wrapper {
+      background: #141a24;
+      border-radius: 24px;
+      padding: 20px 16px 16px;
+      border: 1px solid #26303f;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .table-header h3 {
+      font-weight: 500;
+      font-size: 1.2rem;
+      color: #d6e2f5;
+    }
+
+    .table-header i { color: #3b82f6; margin-right: 8px; }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 6px 8px 6px;
+      font-weight: 500;
+      color: #869bb5;
+      border-bottom: 1px solid #26303f;
+      letter-spacing: 0.3px;
+    }
+
+    td {
+      padding: 14px 6px;
+      border-bottom: 1px solid #1f293b;
+      color: #d9e3f0;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .sector-label {
+      font-weight: 500;
+      color: #a0b9da;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      padding-top: 16px !important;
+      border-bottom: 1px solid #2d3a4f;
+    }
+
+    .status-badge {
+      background: #1e2a3a;
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      display: inline-block;
+      border: 1px solid #2d4057;
+    }
+
+    .status-online { 
+      background: #0f2a1f; 
+      border-color: #1f8b4c; 
+      color: #6fdc9e;
+    }
+
+    .status-offline { 
+      background: #2a1a1a; 
+      border-color: #8f3a3a; 
+      color: #f68b8b;
+    }
+
+    .btn-deactivate {
+      background: transparent;
+      border: 1px solid #4b5c77;
+      color: #b8cae0;
+      padding: 5px 12px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      cursor: default;
+      transition: 0.2s;
+    }
+
+    .btn-deactivate:hover {
+      background: #2d3a4f;
+      border-color: #6b8bc0;
+      color: white;
+    }
+
+    /* right panel - akses perangkat */
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .device-card {
+      background: #141a24;
+      border-radius: 24px;
+      padding: 22px 20px;
+      border: 1px solid #26303f;
+    }
+
+    .device-card .sn-label {
+      font-size: 0.7rem;
+      color: #6e84a3;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+
+    .device-card .sn-value {
+      background: #1b2331;
+      padding: 8px 14px;
+      border-radius: 60px;
+      font-size: 0.9rem;
+      border: 1px solid #2b384d;
+      color: #c4d6f0;
+      display: inline-block;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 20px;
+      margin: 18px 0 12px;
+    }
+
+    .metric-item .metric-label {
+      font-size: 0.7rem;
+      color: #7b92b0;
+      text-transform: uppercase;
+    }
+
+    .metric-item .metric-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #eef4ff;
+    }
+
+    .metric-item .metric-trend {
+      font-size: 0.7rem;
+      color: #4ade80;
+    }
+
+    .metric-item .temp-normal {
+      color: #6fdc9e;
+      font-size: 0.8rem;
+      font-weight: 400;
+      margin-left: 6px;
+    }
+
+    .cost-row {
+      background: #1b2331;
+      padding: 12px 14px;
+      border-radius: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0 12px;
+      border: 1px solid #2a384d;
+    }
+
+    .cost-row span:first-child { color: #9bb0cc; }
+    .cost-row span:last-child { font-weight: 600; color: #e0ebff; }
+
+    /* laporan & maintenance */
+    .report-box {
+      background: #141a24;
+      border-radius: 24px;
+      padding: 20px;
+      border: 1px solid #26303f;
+    }
+
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .report-header h4 { font-weight: 500; color: #d0def5; }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #3a4a63;
+      padding: 6px 16px;
+      border-radius: 40px;
+      color: #b6cae5;
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: default;
+    }
+
+    .btn-outline i { color: #3b82f6; }
+
+    .maintenance-alert {
+      background: #1f2636;
+      border-left: 4px solid #f59e0b;
+      padding: 14px 16px;
+      border-radius: 16px;
+      margin: 18px 0 10px;
+    }
+
+    .maintenance-alert .alert-title {
+      font-weight: 500;
+      color: #facc15;
+      font-size: 0.9rem;
+    }
+
+    .maintenance-alert p {
+      color: #b8cbe3;
+      font-size: 0.9rem;
+      margin: 6px 0 12px;
+    }
+
+    .maintenance-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .maintenance-actions .btn-maint {
+      background: transparent;
+      border: 1px solid #3c4d6a;
+      padding: 5px 18px;
+      border-radius: 40px;
+      color: #cedcf0;
+      font-size: 0.75rem;
+      cursor: default;
+    }
+
+    .maintenance-actions .btn-maint.active {
+      background: #1f8b4c;
+      border-color: #2dab5e;
+      color: white;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px 32px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #1f293b;
+      color: #6c83a3;
+      font-size: 0.8rem;
+    }
+
+    .footer-links span { cursor: default; }
+    .footer-links span:hover { color: #b0c8e8; }
+
+    .copy {
+      font-size: 0.7rem;
+      color: #4b607d;
+      margin-left: auto;
+    }
+
+    /* extra */
+    .text-muted { color: #6e84a3; }
+    .mt-1 { margin-top: 6px; }
+    .flex { display: flex; align-items: center; gap: 6px; }
+    .gap-2 { gap: 12px; }
+  </style>
+</head>
+<body>
+<div class="dashboard">
+  
+  <!-- header -->
+  <div class="header">
+    <div class="logo">
+      <h1>SENSE <span>Platform</span></h1>
+      <div style="font-size:0.8rem; color:#6e84a3; margin-top: 2px;">Technical Operations · Data Center</div>
+    </div>
+    <div class="header-actions">
+      <i class="fas fa-bell"></i>
+      <i class="fas fa-sliders-h"></i>
+      <span class="badge-status"><i class="fas fa-circle"></i> Live telemetry</span>
+    </div>
+  </div>
+
+  <!-- stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label"><i class="fas fa-microchip" style="margin-right: 6px;"></i>Total ESP32 Nodes</div>
+      <div class="stat-number">2,458</div>
+      <div class="stat-sub"><i class="fas fa-check-circle"></i> deployed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><i class="fas fa-wifi"></i> Active & Online</div>
+      <div class="stat-number">2,412</div>
+      <div class="stat-sub"><i class="fas fa-arrow-up" style="color:#4ade80;"></i> 98.1% online</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><i class="fas fa-exclamation-triangle"></i> Inactive / Faults</div>
+      <div class="stat-number">46</div>
+      <div class="stat-sub"><i class="fas fa-times-circle offline-icon"></i> needs attention</div>
+    </div>
+  </div>
+
+  <!-- two column -->
+  <div class="two-col">
+    <!-- left: table -->
+    <div class="table-wrapper">
+      <div class="table-header">
+        <h3><i class="fas fa-list-ul"></i> ESP32 Device Inventory</h3>
+        <span style="color:#6e84a3; font-size:0.8rem;"><i class="fas fa-sync-alt"></i> live</span>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Serial Number</th><th>Device Type</th><th>Status</th><th>Uptime</th><th>Control</th></tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="5" class="sector-label"><i class="fas fa-bolt" style="margin-right: 6px;"></i> POWER MONITORING AREA (SECTOR A)</td></tr>
+            <tr>
+              <td><span style="font-weight:500;">ESP32-PWR-99A1</span></td>
+              <td>Power Sensor</td>
+              <td><span class="status-badge status-online"><i class="fas fa-circle" style="font-size:0.5rem; margin-right:4px;"></i> ONLINE</span></td>
+              <td>45d 12h 52m</td>
+              <td><button class="btn-deactivate">DEACTIVATE</button></td>
+            </tr>
+            <tr>
+              <td><span style="font-weight:500;">ESP32-PWR-99A2</span></td>
+              <td>Power Sensor</td>
+              <td><span class="status-badge status-offline"><i class="fas fa-circle" style="font-size:0.5rem; margin-right:4px;"></i> OFFLINE</span></td>
+              <td>—</td>
+              <td><button class="btn-deactivate">DEACTIVATE</button></td>
+            </tr>
+            <tr><td colspan="5" class="sector-label"><i class="fas fa-thermometer-half" style="margin-right:6px;"></i> THREAT MANAGEMENT AREA (SECTOR B)</td></tr>
+            <tr>
+              <td><span style="font-weight:500;">ESP32-TMP-44B1</span></td>
+              <td>Temp Sensor</td>
+              <td><span class="status-badge status-online"><i class="fas fa-circle" style="font-size:0.5rem; margin-right:4px;"></i> ONLINE</span></td>
+              <td>112d 6h 15m</td>
+              <td><button class="btn-deactivate">DEACTIVATE</button></td>
+            </tr>
+            <tr>
+              <td><span style="font-weight:500;">ESP32-TMP-44B2</span></td>
+              <td>Temp Sensor</td>
+              <td><span class="status-badge status-online"><i class="fas fa-circle" style="font-size:0.5rem; margin-right:4px;"></i> ONLINE</span></td>
+              <td>112d 6h 11m</td>
+              <td><button class="btn-deactivate">DEACTIVATE</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top: 12px; color:#4b607d; font-size:0.75rem; display:flex; gap: 16px;">
+        <span><i class="fas fa-circle" style="color:#4ade80; font-size:0.5rem;"></i> 2,412 online</span>
+        <span><i class="fas fa-circle" style="color:#f87171; font-size:0.5rem;"></i> 46 inactive</span>
+      </div>
+    </div>
+
+    <!-- right panel -->
+    <div class="right-panel">
+      <!-- akses perangkat -->
+      <div class="device-card">
+        <div class="sn-label"><i class="fas fa-qrcode"></i> SERIAL NUMBER PERANGKAT</div>
+        <div class="sn-value"><i class="fas fa-tag" style="margin-right:8px; color:#3b82f6;"></i> SNS-8923-XR</div>
+
+        <div class="metrics-grid">
+          <div class="metric-item">
+            <div class="metric-label">POWER DRAW</div>
+            <div class="metric-value">3,482W</div>
+            <div class="metric-trend"><i class="fas fa-arrow-up"></i> 12% dari rata-rata</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">TEMPERATURE</div>
+            <div class="metric-value">42.5°C <span class="temp-normal"><i class="fas fa-check-circle"></i> Normal</span></div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">EFFICIENCY</div>
+            <div class="metric-value">94.2%</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">BIAYA OPERASIONAL</div>
+            <div class="metric-value" style="font-size:1.2rem;">Rp 1.240.000</div>
+            <div class="metric-trend">/bln · estimasi berjalan</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- laporan & maintenance -->
+      <div class="report-box">
+        <div class="report-header">
+          <h4><i class="fas fa-file-alt" style="margin-right: 8px; color:#3b82f6;"></i> Pusat Laporan</h4>
+          <span class="btn-outline"><i class="fas fa-calendar-alt"></i> Periode Ekspor</span>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <span class="btn-outline" style="background:#1f2a3a; border-color:#3a4a63;"><i class="fas fa-clock"></i> Harian</span>
+          <span class="btn-outline"><i class="fas fa-file-csv"></i> Ekspor Data (CSV)</span>
+          <span class="btn-outline"><i class="fab fa-whatsapp"></i> Kirim Laporan via WhatsApp</span>
+        </div>
+
+        <!-- maintenance -->
+        <div class="maintenance-alert">
+          <div class="alert-title"><i class="fas fa-exclamation-circle" style="margin-right: 6px;"></i> Peringatan Terdeteksi</div>
+          <p>Filter udara memerlukan pembersihan rutin. Efisiensi menurun 2%.</p>
+          <div class="maintenance-actions">
+            <span class="btn-maint active"><i class="fas fa-check"></i> Harus Maintenance</span>
+            <span class="btn-maint">Sudah Maintenance</span>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+          <span style="font-size:0.7rem; color:#6e84a3;"><i class="fas fa-tools"></i> Status Pemeliharaan</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <div class="footer-links">
+    <span>© 2024 SENSE IoT Systems. All rights reserved.</span>
+    <span><i class="fas fa-book"></i> DOCUMENTATION</span>
+    <span><i class="fas fa-lock"></i> PRIVACY POLICY</span>
+    <span><i class="fas fa-server"></i> SYSTEM STATUS</span>
+    <span><i class="fas fa-headset"></i> CONTACT SUPPORT</span>
+    <span class="copy"><i class="fas fa-circle" style="color:#3b82f6; font-size:0.5rem;"></i> v2.4.1</span>
+  </div>
+
+</div>
+</body>
+</html>
